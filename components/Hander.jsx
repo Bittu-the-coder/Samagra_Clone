@@ -1,8 +1,10 @@
 import React from "react";
 import { View, TouchableOpacity, Image, Text, StyleSheet } from "react-native";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const Header = ({ onMenuPress }) => {
+  const navigation = useNavigation();
   return (
     <View style={styles.header}>
       {/* Hamburger Menu */}
@@ -22,7 +24,7 @@ const Header = ({ onMenuPress }) => {
       </View>
 
       {/* Notification Bell (Outlined & Light Grey) */}
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate("Notifications")}>
         <FontAwesome name="bell-o" size={25} color="#aaa" />
       </TouchableOpacity>
     </View>

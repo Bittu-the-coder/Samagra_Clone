@@ -1,48 +1,47 @@
+// src/screens/HomeScreen.js
 import React from "react";
 import {
   View,
   Text,
   Image,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   ToastAndroid,
 } from "react-native";
 import Header from "../components/Hander";
 import IconButton from "../components/IconButton";
 import Notice from "../components/Notice";
-import { useNavigation } from "@react-navigation/native";
 
-const HomeScreen = () => {
-  const navigation = useNavigation();
+const HomeScreen = ({ navigation }) => {
   const handleMenuPress = () => {
     ToastAndroid.show("Menu Pressed", ToastAndroid.SHORT);
   };
+
   const buttons = [
     {
       title: "Attendance",
       icon: "book-reader",
-      onPress: () => handleMenuPress(),
+      onPress: () => navigation.navigate("Attendance"),
     },
     {
       title: "Resources",
       icon: "book-open",
-      onPress: () => handleMenuPress(),
+      onPress: () => navigation.navigate("Resources"),
     },
     {
       title: "Results",
       icon: "trophy",
-      onPress: () => handleMenuPress(),
+      onPress: () => navigation.navigate("Results"),
     },
     {
       title: "Notices",
       icon: "sticky-note",
-      onPress: () => handleMenuPress(),
+      onPress: () => navigation.navigate("Notices"),
     },
     {
       title: "Assignments",
       icon: "swatchbook",
-      onPress: () => handleMenuPress(),
+      onPress: () => navigation.navigate("Assignments"),
     },
   ];
 
@@ -63,10 +62,11 @@ const HomeScreen = () => {
       for: "Third Year(6th sem)",
     },
   ];
+
   return (
     <View style={styles.container}>
       {/* Header */}
-      <Header onMenuPress={() => navigation.openDrawer()} />;
+      <Header onMenuPress={() => navigation.openDrawer()} />
       {/* Campus Image */}
       <Image
         source={require("../assets/campus.jpg")}
@@ -121,17 +121,6 @@ const styles = StyleSheet.create({
     width: "95%",
     alignSelf: "center",
   },
-  button: {
-    backgroundColor: "#007bff",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
   noticeSection: {
     backgroundColor: "#f9f9f9",
     padding: 10,
@@ -144,10 +133,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     color: "#333",
     alignSelf: "center",
-  },
-  noticeItem: {
-    fontSize: 16,
-    paddingVertical: 5,
   },
 });
 

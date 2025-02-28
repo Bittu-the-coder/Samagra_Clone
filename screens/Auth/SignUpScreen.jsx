@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   Pressable,
   TextInput,
-  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons"; // For visibility icons
 import OrDivider from "../../components/OrDivider";
+import { ScrollView } from "react-native-gesture-handler";
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
@@ -32,7 +32,7 @@ const SignUpScreen = () => {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: "#fff", paddingVertical: 20 }}>
+    <ScrollView style={{ backgroundColor: "#fff" }}>
       <View style={styles.container}>
         <View style={{ alignItems: "center" }}>
           <Image
@@ -122,7 +122,7 @@ const SignUpScreen = () => {
         {/* Sign In Link */}
         <Pressable onPress={() => navigation.navigate("SignIn")}>
           <Text style={styles.signInText}>
-            Already have an account?{" "}
+            Already have an account?
             <Text style={styles.signInLink}>Sign In</Text>
           </Text>
         </Pressable>
@@ -168,8 +168,9 @@ const styles = StyleSheet.create({
     padding: 10, // Add padding for better touch area
   },
   signInText: {
-    marginTop: 20,
+    marginTop: 10,
     color: "#888",
+    marginBottom: 20,
   },
   signInLink: {
     color: "#007BFF",
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: "90%",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 5,
   },
 });
 
