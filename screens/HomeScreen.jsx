@@ -1,4 +1,3 @@
-// src/screens/HomeScreen.js
 import React from "react";
 import {
   View,
@@ -8,15 +7,11 @@ import {
   ScrollView,
   ToastAndroid,
 } from "react-native";
-import Header from "../components/Hander";
+import Header from "../components/Header";
 import IconButton from "../components/IconButton";
 import Notice from "../components/Notice";
 
-const HomeScreen = ({ navigation }) => {
-  const handleMenuPress = () => {
-    ToastAndroid.show("Menu Pressed", ToastAndroid.SHORT);
-  };
-
+const HomeScreen = ({ navigation, route }) => {
   const buttons = [
     {
       title: "Attendance",
@@ -66,7 +61,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <Header onMenuPress={() => navigation.openDrawer()} />
+      <Header onMenuPress={() => navigation.openDrawer()} route={route} />
       {/* Campus Image */}
       <Image
         source={require("../assets/campus.jpg")}

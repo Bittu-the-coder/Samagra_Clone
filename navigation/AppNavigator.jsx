@@ -1,4 +1,3 @@
-// src/navigation/AppNavigator.js
 import * as React from "react";
 import { DrawerActions, NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";

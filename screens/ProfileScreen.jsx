@@ -1,9 +1,56 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
-import React from "react";
+import { useNavigation } from "@react-navigation/native";
+import React, { useContext, useEffect, useState } from "react";
 import { Image, Text, View } from "react-native";
 import { Pressable, ScrollView } from "react-native-gesture-handler";
+import { AuthContext } from "../context/AuthContext";
 
-function ProfileScreen() {
+import { auth, db } from "../firebaseConfig"; // Import Firebase auth and firestore
+
+import { doc, getDoc } from "firebase/firestore";
+
+function ProfileScreen({ route }) {
+  const navigation = useNavigation();
+  const { logout } = useContext(AuthContext);
+  const [activeTab, setActiveTab] = useState("Home");
+  const [fullName, setFullName] = useState("User");
+
+  const justLoggedIn = route?.params?.justLoggedIn || false;
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            const name = userDoc.data().fullName;
+            setFullName(name);
+            if (justLoggedIn) {
+              ToastAndroid.show(`Welcome, ${name}!`, ToastAndroid.LONG);
+            }
+          } else {
+            console.log("No such document!");
+          }
+        } else {
+          console.log("No user is signed in.");
+        }
+      } catch (error) {
+        console.error("Error fetching user name:", error);
+
+        setFullName("User");
+      }
+    };
+
+    fetchUserName();
+  }, [justLoggedIn]);
+
+  const handlePress = (screen) => {
+    setActiveTab(screen);
+    screen === "Home"
+      ? navigation.navigate("Main", { screen: "Home" })
+      : navigation.navigate(screen);
+  };
   return (
     <ScrollView style={{ backgroundColor: "#fff" }}>
       <View
@@ -28,9 +75,7 @@ function ProfileScreen() {
             style={styles.profileImage}
           />
           <View style={{ marginLeft: 20 }}>
-            <Text style={{ fontWeight: "bold", fontSize: 20 }}>
-              Alice Smith
-            </Text>
+            <Text style={{ fontWeight: "bold", fontSize: 20 }}>{fullName}</Text>
             <Text style={{ fontSize: 16, fontWeight: "700" }}>2022021667</Text>
             <Text style={{ fontSize: 16, fontWeight: "700" }}>CSE-D</Text>
           </View>
@@ -244,7 +289,7 @@ function ProfileScreen() {
                 alignSelf: "center",
               },
             ]}
-            onPress={() => navigation.navigate("Home")}
+            onPress={() => handlePress("Home")}
           >
             <Feather name="refresh-cw" size={24} color="black" />
             <Text style={styles.buttonText}>Check for updates</Text>
@@ -258,7 +303,9 @@ function ProfileScreen() {
                 backgroundColor: "#007bff",
               },
             ]}
-            onPress={() => navigation.navigate("Home")}
+            onPress={() => {
+              logout();
+            }}
           >
             <Text style={[styles.buttonText, { color: "#fff" }]}>Logout</Text>
           </Pressable>

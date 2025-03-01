@@ -1,10 +1,58 @@
-import React from "react";
-import { View, TouchableOpacity, Image, Text, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  TouchableOpacity,
+  Image,
+  Text,
+  StyleSheet,
+  ToastAndroid,
+} from "react-native";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-const Header = ({ onMenuPress }) => {
+import { auth, db } from "../firebaseConfig"; // Import Firebase auth and firestore
+
+import { doc, getDoc } from "firebase/firestore";
+
+const Header = ({ onMenuPress, route }) => {
   const navigation = useNavigation();
+  const [fullName, setFullName] = useState("User");
+
+  const justLoggedIn = route?.params?.justLoggedIn || false;
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            const name = userDoc.data().fullName;
+            setFullName(name);
+            if (justLoggedIn) {
+              ToastAndroid.show(`Welcome, ${name}!`, ToastAndroid.LONG);
+            }
+          } else {
+            console.log("No such document!");
+          }
+        } else {
+          console.log("No user is signed in.");
+        }
+      } catch (error) {
+        console.error("Error fetching user name:", error);
+
+        setFullName("User");
+      }
+    };
+
+    fetchUserName();
+  }, [justLoggedIn]);
+
+  useEffect(() => {
+    if (justLoggedIn) {
+      ToastAndroid.show(`Welcome, ${fullName}!`, ToastAndroid.LONG);
+    }
+  }, [justLoggedIn, fullName]);
   return (
     <View style={styles.header}>
       {/* Hamburger Menu */}
@@ -20,7 +68,7 @@ const Header = ({ onMenuPress }) => {
             style={styles.profileImage}
           />
         </View>
-        <Text style={styles.greeting}>Hello, Alice</Text>
+        <Text style={styles.greeting}>Hello, {fullName.split(" ")[0]} !</Text>
       </View>
 
       {/* Notification Bell (Outlined & Light Grey) */}
@@ -37,7 +85,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 15,
-    marginTop: 30,
+    marginTop: 20,
     width: "95%",
     alignSelf: "center",
   },

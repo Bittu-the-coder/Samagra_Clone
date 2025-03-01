@@ -1,5 +1,4 @@
-// src/screens/Auth/SignInScreen.js
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -8,20 +7,62 @@ import {
   TouchableOpacity,
   Pressable,
   TextInput,
+  ToastAndroid,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import OrDivider from "../../components/OrDivider";
 import { AuthContext } from "../../context/AuthContext";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebaseConfig";
 
 const SignInScreen = () => {
   const navigation = useNavigation();
-  const { login } = useContext(AuthContext); // Use AuthContext
-  const [showPassword, setShowPassword] = React.useState(false);
+  const { login } = useContext(AuthContext);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignIn = () => {
-    login(); // Simulate successful login
-    navigation.navigate("Home"); // Navigate to Home after sign-in
+  const handleSignIn = async () => {
+    // Check for missing fields
+    if (!email || !password) {
+      ToastAndroid.show(
+        "Please enter both email and password.",
+        ToastAndroid.SHORT
+      );
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      ToastAndroid.show("Logged in successfully!", ToastAndroid.SHORT);
+    } catch (error) {
+      // Handle specific Firebase auth errors
+      switch (error.code) {
+        case "auth/invalid-email":
+          ToastAndroid.show("Invalid email format.", ToastAndroid.SHORT);
+          break;
+        case "auth/user-not-found":
+          ToastAndroid.show(
+            "No user found with this email.",
+            ToastAndroid.SHORT
+          );
+          break;
+        case "auth/wrong-password":
+          ToastAndroid.show("Incorrect password.", ToastAndroid.SHORT);
+          break;
+        case "auth/too-many-requests":
+          ToastAndroid.show(
+            "Too many attempts. Try again later.",
+            ToastAndroid.SHORT
+          );
+          break;
+        default:
+          Alert.alert("Sign-In Error", error.message); // Generic fallback
+          break;
+      }
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -48,12 +89,21 @@ const SignInScreen = () => {
       </TouchableOpacity>
       <OrDivider />
       <View style={{ width: "90%", marginBottom: 10 }}>
-        <TextInput placeholder="University Roll No." style={styles.inputText} />
+        <TextInput
+          placeholder="University Roll No. or Email"
+          style={styles.inputText}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
         <View style={styles.passwordContainer}>
           <TextInput
             placeholder="Password"
             secureTextEntry={!showPassword}
             style={[styles.inputText, { flex: 1 }]}
+            value={password}
+            onChangeText={setPassword}
           />
           <TouchableOpacity
             onPress={togglePasswordVisibility}

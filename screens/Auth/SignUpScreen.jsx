@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -7,20 +7,55 @@ import {
   TouchableOpacity,
   Pressable,
   TextInput,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { MaterialIcons } from "@expo/vector-icons"; // For visibility icons
+import { MaterialIcons } from "@expo/vector-icons";
 import OrDivider from "../../components/OrDivider";
 import { ScrollView } from "react-native-gesture-handler";
+import { auth, db, createUserWithEmailAndPassword } from "../../firebaseConfig";
+
+import { doc, setDoc } from "firebase/firestore";
+import { AuthContext } from "../../context/AuthContext";
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
-  const [showPassword, setShowPassword] = useState(false); // State for password visibility
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State for confirm password visibility
+  const [fullName, setFullName] = useState("");
+  const [rollNo, setRollNo] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleSignUp = () => {
-    // Simulate a successful sign-up
-    navigation.navigate("Home"); // Navigate to Home after sign-up
+  const handleSignUp = async () => {
+    if (!fullName || !rollNo || !email || !password || !confirmPassword) {
+      Alert.alert("Error", "All fields are required.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match.");
+      return;
+    }
+    try {
+      // Create user in Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      // Save user info in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        fullName,
+        rollNo,
+        email,
+      });
+      Alert.alert("Success", "Account created successfully!");
+      navigation.navigate("Main");
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -56,12 +91,19 @@ const SignUpScreen = () => {
         <OrDivider />
         <View style={{ width: "90%", marginBottom: 10 }}>
           {/* Full Name Input */}
-          <TextInput placeholder="Full Name" style={styles.inputText} />
+          <TextInput
+            placeholder="Full Name"
+            style={styles.inputText}
+            value={fullName}
+            onChangeText={setFullName}
+          />
 
           {/* University Roll No. Input */}
           <TextInput
             placeholder="University Roll No."
             style={styles.inputText}
+            value={rollNo}
+            onChangeText={setRollNo}
           />
 
           {/* Email Input */}
@@ -69,16 +111,61 @@ const SignUpScreen = () => {
             placeholder="Email"
             keyboardType="email-address"
             style={styles.inputText}
+            value={email}
+            onChangeText={setEmail}
           />
-
           {/* Password Input with Visibility Icon */}
+
           <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Password"
+              secureTextEntry={!showPassword}
+              style={[styles.inputText, { flex: 1 }]}
+              value={password}
+              onChangeText={setPassword}
+            />
+
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.visibilityIcon}
+            >
+              <MaterialIcons
+                name={showPassword ? "visibility" : "visibility-off"}
+                size={24}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Confirm Password Input */}
+
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Confirm Password"
+              secureTextEntry={!showConfirmPassword}
+              style={[styles.inputText, { flex: 1 }]}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+
+            <TouchableOpacity
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              style={styles.visibilityIcon}
+            >
+              <MaterialIcons
+                name={showConfirmPassword ? "visibility" : "visibility-off"}
+                size={24}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* <View style={styles.passwordContainer}>
             <TextInput
               placeholder="Password"
               secureTextEntry={!showPassword} // Toggle secureTextEntry
               style={[styles.inputText, { flex: 1 }]} // Take up remaining space
             />
-            {/* Visibility Icon */}
             <TouchableOpacity
               onPress={togglePasswordVisibility}
               style={styles.visibilityIcon}
@@ -91,14 +178,12 @@ const SignUpScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Confirm Password Input with Visibility Icon */}
           <View style={styles.passwordContainer}>
             <TextInput
               placeholder="Confirm Password"
               secureTextEntry={!showConfirmPassword} // Toggle secureTextEntry
               style={[styles.inputText]} // Take up remaining space
             />
-            {/* Visibility Icon */}
             <TouchableOpacity
               onPress={toggleConfirmPasswordVisibility}
               style={styles.visibilityIcon}
@@ -109,11 +194,11 @@ const SignUpScreen = () => {
                 color="#888"
               />
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
 
         {/* Sign Up Button */}
-        <Pressable onPress={handleSignUp} style={styles.button}>
+        <Pressable onPress={() => handleSignUp()} style={styles.button}>
           <Text style={{ color: "white", fontSize: 16, fontWeight: "500" }}>
             Sign Up
           </Text>
@@ -123,7 +208,7 @@ const SignUpScreen = () => {
         <Pressable onPress={() => navigation.navigate("SignIn")}>
           <Text style={styles.signInText}>
             Already have an account?
-            <Text style={styles.signInLink}>Sign In</Text>
+            <Text style={styles.signInLink}> Sign In</Text>
           </Text>
         </Pressable>
       </View>
