@@ -8,6 +8,7 @@ import {
   Pressable,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import { ScrollView } from "react-native-gesture-handler";
 
 const ResourcesScreen = () => {
   const [selectedCourse, setSelectedCourse] = useState("CSE");
@@ -91,237 +92,271 @@ const ResourcesScreen = () => {
   ];
 
   return (
-    <View style={styles.container}>
-      {/* Tab Container */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity onPress={() => handleTabChange("pyqs")}>
-          <Text style={[styles.tab, activeTab === "pyqs" && styles.activeTab]}>
-            Pyqs
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleTabChange("notes")}>
-          <Text style={[styles.tab, activeTab === "notes" && styles.activeTab]}>
-            Notes
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleTabChange("syllabus")}>
-          <Text
-            style={[styles.tab, activeTab === "syllabus" && styles.activeTab]}
-          >
-            Syllabus
-          </Text>
-        </TouchableOpacity>
+    <ScrollView>
+      <View style={styles.container}>
+        {/* Tab Container */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity onPress={() => handleTabChange("pyqs")}>
+            <Text
+              style={[styles.tab, activeTab === "pyqs" && styles.activeTab]}
+            >
+              Pyqs
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleTabChange("notes")}>
+            <Text
+              style={[styles.tab, activeTab === "notes" && styles.activeTab]}
+            >
+              Notes
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleTabChange("syllabus")}>
+            <Text
+              style={[styles.tab, activeTab === "syllabus" && styles.activeTab]}
+            >
+              Syllabus
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Conditional Rendering Based on Active Tab */}
+        {activeTab === "pyqs" && (
+          <View>
+            <View style={styles.filters}>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={semester}
+                  onValueChange={(itemValue) => setSemester(itemValue)}
+                  style={styles.picker}
+                >
+                  {[2, 3, 4, 5, 6, 7, 8].map((value) => (
+                    <Picker.Item
+                      key={value}
+                      label={value.toString()}
+                      value={value.toString()}
+                    />
+                  ))}
+                </Picker>
+              </View>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={selectedCourse}
+                  onValueChange={(itemValue) => setSelectedCourse(itemValue)}
+                  style={styles.picker}
+                >
+                  {[
+                    "CSE",
+                    "IT",
+                    "ECE",
+                    "EEE",
+                    "ME",
+                    "CE",
+                    "AE",
+                    "PE",
+                    "CHE",
+                  ].map((course) => (
+                    <Picker.Item key={course} label={course} value={course} />
+                  ))}
+                </Picker>
+              </View>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={session}
+                  onValueChange={(itemValue) => setSession(itemValue)}
+                  style={styles.picker}
+                >
+                  {[
+                    "Select Session",
+                    "2024-2028",
+                    "2023-2027",
+                    "2022-2026",
+                    "2021-2025",
+                  ].map((session) => (
+                    <Picker.Item
+                      key={session}
+                      label={session}
+                      value={session}
+                    />
+                  ))}
+                </Picker>
+              </View>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={minor}
+                  onValueChange={(itemValue) => setMinor(itemValue)}
+                  style={styles.picker}
+                >
+                  {["Minor 1", "Minor 2", "Major"].map((minor) => (
+                    <Picker.Item key={minor} label={minor} value={minor} />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+            <FlatList
+              data={resources}
+              keyExtractor={(item) => item.title}
+              renderItem={({ item }) => (
+                <View style={styles.resourceItem}>
+                  <Text style={styles.resourceTitle}>{item.title}</Text>
+                  <Text>
+                    {item.year} {item.course}
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Text>{item.semester} </Text>
+                    <Text style={{ fontWeight: "bold", marginRight: 10 }}>
+                      {item.minor}
+                    </Text>
+                  </View>
+                </View>
+              )}
+            />
+          </View>
+        )}
+
+        {activeTab === "notes" && (
+          <View>
+            <View style={styles.filters}>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={selectedCourse}
+                  onValueChange={(itemValue) => setSelectedCourse(itemValue)}
+                  style={styles.picker}
+                >
+                  {[
+                    "CSE",
+                    "IT",
+                    "ECE",
+                    "EEE",
+                    "ME",
+                    "CE",
+                    "AE",
+                    "PE",
+                    "CHE",
+                  ].map((course) => (
+                    <Picker.Item key={course} label={course} value={course} />
+                  ))}
+                </Picker>
+              </View>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={session}
+                  onValueChange={(itemValue) => setSession(itemValue)}
+                  style={styles.picker}
+                >
+                  {[
+                    "Select Session",
+                    "2024-2028",
+                    "2023-2027",
+                    "2022-2026",
+                    "2021-2025",
+                  ].map((session) => (
+                    <Picker.Item
+                      key={session}
+                      label={session}
+                      value={session}
+                    />
+                  ))}
+                </Picker>
+              </View>
+              <View style={[styles.pickerContainer, { flex: 1, marginTop: 5 }]}>
+                <Picker
+                  selectedValue={subjects}
+                  onValueChange={(itemValue) => setSubjects(itemValue)}
+                  style={[styles.picker, { width: "100%" }]}
+                >
+                  {[
+                    "Select Subject",
+                    "Maths",
+                    "Physics",
+                    "Chemistry",
+                    "Biology",
+                    "English",
+                    "Mechanical Engineering",
+                    "Electrical Engineering",
+                    "Civil Engineering",
+                    "Computer Science Engineering",
+                    "Chemical Engineering",
+                  ].map((subject) => (
+                    <Picker.Item
+                      key={subject}
+                      label={subject}
+                      value={subject}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+            <FlatList
+              data={resources}
+              keyExtractor={(item) => item.title}
+              renderItem={({ item }) => (
+                <View style={styles.resourceItem}>
+                  <Text style={styles.resourceTitle}>{item.title}</Text>
+                  <Text>
+                    {item.year} {item.course}
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Text>{item.semester} </Text>
+                    <Text style={{ fontWeight: "bold", marginRight: 10 }}>
+                      {item.minor}
+                    </Text>
+                  </View>
+                </View>
+              )}
+            />
+          </View>
+        )}
+        {activeTab === "syllabus" && (
+          <View>
+            {/* Year Picker */}
+            <View style={styles.filters}>
+              <View style={[styles.pickerContainer, { flex: 1 }]}>
+                <Picker
+                  selectedValue={selectedCourse}
+                  onValueChange={(itemValue) => setSelectedCourse(itemValue)}
+                  style={[styles.picker, { width: "100%" }]}
+                >
+                  {["2024-2028", "2023-2027", "2022-2026", "2021-2025"].map(
+                    (course) => (
+                      <Picker.Item key={course} label={course} value={course} />
+                    )
+                  )}
+                </Picker>
+              </View>
+            </View>
+            {/* Branch List */}
+            <View style={styles.branchList}>
+              {loading ? (
+                <ActivityIndicator size="large" color="#10d0f2" />
+              ) : (
+                branches.map((branch) => (
+                  <Pressable
+                    key={branch}
+                    // onPress={() => handleBranchPress(branch)}
+                    style={[
+                      styles.branchItem,
+                      selectedBranch === branch && styles.selectedBranchItem,
+                    ]}
+                  >
+                    <Text style={styles.branchText}>{branch}</Text>
+                  </Pressable>
+                ))
+              )}
+            </View>
+          </View>
+        )}
       </View>
-
-      {/* Conditional Rendering Based on Active Tab */}
-      {activeTab === "pyqs" && (
-        <View>
-          <View style={styles.filters}>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={semester}
-                onValueChange={(itemValue) => setSemester(itemValue)}
-                style={styles.picker}
-              >
-                {[2, 3, 4, 5, 6, 7, 8].map((value) => (
-                  <Picker.Item
-                    key={value}
-                    label={value.toString()}
-                    value={value.toString()}
-                  />
-                ))}
-              </Picker>
-            </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedCourse}
-                onValueChange={(itemValue) => setSelectedCourse(itemValue)}
-                style={styles.picker}
-              >
-                {["CSE", "IT", "ECE", "EEE", "ME", "CE", "AE", "PE", "CHE"].map(
-                  (course) => (
-                    <Picker.Item key={course} label={course} value={course} />
-                  )
-                )}
-              </Picker>
-            </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={session}
-                onValueChange={(itemValue) => setSession(itemValue)}
-                style={styles.picker}
-              >
-                {[
-                  "Select Session",
-                  "2024-2028",
-                  "2023-2027",
-                  "2022-2026",
-                  "2021-2025",
-                ].map((session) => (
-                  <Picker.Item key={session} label={session} value={session} />
-                ))}
-              </Picker>
-            </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={minor}
-                onValueChange={(itemValue) => setMinor(itemValue)}
-                style={styles.picker}
-              >
-                {["Minor 1", "Minor 2", "Major"].map((minor) => (
-                  <Picker.Item key={minor} label={minor} value={minor} />
-                ))}
-              </Picker>
-            </View>
-          </View>
-          <FlatList
-            data={resources}
-            keyExtractor={(item) => item.title}
-            renderItem={({ item }) => (
-              <View style={styles.resourceItem}>
-                <Text style={styles.resourceTitle}>{item.title}</Text>
-                <Text>
-                  {item.year} {item.course}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text>{item.semester} </Text>
-                  <Text style={{ fontWeight: "bold", marginRight: 10 }}>
-                    {item.minor}
-                  </Text>
-                </View>
-              </View>
-            )}
-          />
-        </View>
-      )}
-
-      {activeTab === "notes" && (
-        <View>
-          <View style={styles.filters}>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedCourse}
-                onValueChange={(itemValue) => setSelectedCourse(itemValue)}
-                style={styles.picker}
-              >
-                {["CSE", "IT", "ECE", "EEE", "ME", "CE", "AE", "PE", "CHE"].map(
-                  (course) => (
-                    <Picker.Item key={course} label={course} value={course} />
-                  )
-                )}
-              </Picker>
-            </View>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={session}
-                onValueChange={(itemValue) => setSession(itemValue)}
-                style={styles.picker}
-              >
-                {[
-                  "Select Session",
-                  "2024-2028",
-                  "2023-2027",
-                  "2022-2026",
-                  "2021-2025",
-                ].map((session) => (
-                  <Picker.Item key={session} label={session} value={session} />
-                ))}
-              </Picker>
-            </View>
-            <View style={[styles.pickerContainer, { flex: 1, marginTop: 5 }]}>
-              <Picker
-                selectedValue={subjects}
-                onValueChange={(itemValue) => setSubjects(itemValue)}
-                style={[styles.picker, { width: "100%" }]}
-              >
-                {[
-                  "Select Subject",
-                  "Maths",
-                  "Physics",
-                  "Chemistry",
-                  "Biology",
-                  "English",
-                  "Mechanical Engineering",
-                  "Electrical Engineering",
-                  "Civil Engineering",
-                  "Computer Science Engineering",
-                  "Chemical Engineering",
-                ].map((subject) => (
-                  <Picker.Item key={subject} label={subject} value={subject} />
-                ))}
-              </Picker>
-            </View>
-          </View>
-          <FlatList
-            data={resources}
-            keyExtractor={(item) => item.title}
-            renderItem={({ item }) => (
-              <View style={styles.resourceItem}>
-                <Text style={styles.resourceTitle}>{item.title}</Text>
-                <Text>
-                  {item.year} {item.course}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text>{item.semester} </Text>
-                  <Text style={{ fontWeight: "bold", marginRight: 10 }}>
-                    {item.minor}
-                  </Text>
-                </View>
-              </View>
-            )}
-          />
-        </View>
-      )}
-      {activeTab === "syllabus" && (
-        <View>
-          {/* Year Picker */}
-          <View style={styles.filters}>
-            <View style={[styles.pickerContainer, { flex: 1 }]}>
-              <Picker
-                selectedValue={selectedCourse}
-                onValueChange={(itemValue) => setSelectedCourse(itemValue)}
-                style={[styles.picker, { width: "100%" }]}
-              >
-                {["2024-2028", "2023-2027", "2022-2026", "2021-2025"].map(
-                  (course) => (
-                    <Picker.Item key={course} label={course} value={course} />
-                  )
-                )}
-              </Picker>
-            </View>
-          </View>
-          {/* Branch List */}
-          <View style={styles.branchList}>
-            {loading ? (
-              <ActivityIndicator size="large" color="#10d0f2" />
-            ) : (
-              branches.map((branch) => (
-                <Pressable
-                  key={branch}
-                  // onPress={() => handleBranchPress(branch)}
-                  style={[
-                    styles.branchItem,
-                    selectedBranch === branch && styles.selectedBranchItem,
-                  ]}
-                >
-                  <Text style={styles.branchText}>{branch}</Text>
-                </Pressable>
-              ))
-            )}
-          </View>
-        </View>
-      )}
-    </View>
+    </ScrollView>
   );
 };
 
